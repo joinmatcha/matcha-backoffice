@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo, useEffect } from "react"
 
 import { AppSidebar } from "@/components/app-sidebar"
 import { Separator } from "@/components/ui/separator"
@@ -14,15 +14,40 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-import { usersMock } from "./data"
+import { usersMock, type User } from "./data"
+
+const USERS_PER_PAGE = 10
 
 export default function UsersPage() {
+  const [users, setUsers] = useState<User[]>(usersMock)
   const [search, setSearch] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
-  const filteredUsers = usersMock.filter((user) =>
-    user.name.toLowerCase().includes(search.toLowerCase()) ||
-    user.email.toLowerCase().includes(search.toLowerCase())
+  // Filtrage
+  const filteredUsers = useMemo(() => {
+    return users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(search.toLowerCase()) ||
+        user.email.toLowerCase().includes(search.toLowerCase())
+    )
+  }, [users, search])
+
+  // Reset page si recherche change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [search])
+
+  const totalPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE)
+
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * USERS_PER_PAGE,
+    currentPage * USERS_PER_PAGE
   )
+
+  const handleDelete = (id: number) => {
+    setUsers((prev) => prev.filter((u) => u.id !== id))
+  }
 
   return (
     <SidebarProvider>
@@ -63,8 +88,8 @@ export default function UsersPage() {
               </thead>
 
               <tbody>
-                {filteredUsers.length > 0 ? (
-                  filteredUsers.map((user) => (
+                {paginatedUsers.length > 0 ? (
+                  paginatedUsers.map((user) => (
                     <tr key={user.id} className="border-b">
                       <td className="py-2">{user.name}</td>
                       <td>{user.email}</td>
@@ -79,9 +104,31 @@ export default function UsersPage() {
                           {user.role}
                         </Badge>
                       </td>
-                      <td>
-                        <Button size="sm" variant="outline">
+                      <td className="space-x-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedUser(user)}
+                        >
                           Voir
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() =>
+                            console.log("Edit user:", user)
+                          }
+                        >
+                          Edit
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDelete(user.id)}
+                        >
+                          Delete
                         </Button>
                       </td>
                     </tr>
@@ -98,6 +145,57 @@ export default function UsersPage() {
                 )}
               </tbody>
             </table>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-end gap-2 mt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => p - 1)}
+                >
+                  Précédent
+                </Button>
+
+                <span className="text-sm self-center">
+                  Page {currentPage} / {totalPages}
+                </span>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => p + 1)}
+                >
+                  Suivant
+                </Button>
+              </div>
+            )}
+
+            {/* View Panel */}
+            {selectedUser && (
+              <div className="rounded-lg border bg-background p-4 mt-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-sm font-semibold">
+                    Détails utilisateur
+                  </h2>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setSelectedUser(null)}
+                  >
+                    Fermer
+                  </Button>
+                </div>
+
+                <div className="mt-4 space-y-2 text-sm">
+                  <p><strong>Nom:</strong> {selectedUser.name}</p>
+                  <p><strong>Email:</strong> {selectedUser.email}</p>
+                  <p><strong>Rôle:</strong> {selectedUser.role}</p>
+                </div>
+              </div>
+            )}
 
           </div>
         </div>
