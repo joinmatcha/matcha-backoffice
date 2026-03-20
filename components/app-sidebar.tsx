@@ -52,18 +52,18 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
-      url: "#",
+      title: "Backoffice",
+      url: "/",
       icon: SquareTerminal,
       isActive: true,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "Stats",
+          url: "/dashboard/stats",
         },
         {
-          title: "Starred",
-          url: "#",
+          title: "Users",
+          url: "/dashboard/users",
         },
         {
           title: "Settings",
