@@ -13,14 +13,15 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-import { usersMock, type User } from "./data"
 import UsersTable from "./users-table"
 import UserForm from "./user-form"
+import type { User } from "./data"
 
 const USERS_PER_PAGE = 10
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>(usersMock)
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -33,6 +34,23 @@ export default function UsersPage() {
   const [formLastName, setFormLastName] = useState("")
   const [formEmail, setFormEmail] = useState("")
   const [formRole, setFormRole] = useState<"Admin" | "User">("User")
+
+  // ✅ FETCH USERS (BACK)
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/users")
+        const data = await res.json()
+        setUsers(data)
+      } catch (error) {
+        console.error("Erreur fetch users:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchUsers()
+  }, [])
 
   const filteredUsers = useMemo(() => {
     return users.filter(
@@ -54,8 +72,17 @@ export default function UsersPage() {
     currentPage * USERS_PER_PAGE
   )
 
-  const handleDelete = (id: number) => {
-    setUsers((prev) => prev.filter((u) => u.id !== id))
+  // ✅ DELETE (BACK)
+  const handleDelete = async (id: number) => {
+    try {
+      await fetch(`http://localhost:5000/users/${id}`, {
+        method: "DELETE",
+      })
+
+      setUsers((prev) => prev.filter((u) => u.id !== id))
+    } catch (err) {
+      console.error("Erreur delete:", err)
+    }
   }
 
   const openCreateForm = () => {
@@ -76,30 +103,51 @@ export default function UsersPage() {
     setIsFormOpen(true)
   }
 
-  const handleSaveUser = () => {
-    if (!formFirstName || !formEmail) return
+  // ✅ CREATE + UPDATE (BACK)
+  const handleSaveUser = async () => {
+    if (!formFirstName || !formLastName || !formEmail) return
 
-    if (editingUser) {
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === editingUser.id
-            ? { ...u, firstName: formFirstName, lastName: formLastName, email: formEmail, role: formRole }
-            : u
-        )
-      )
-    } else {
-      const newUser: User = {
-        id: Date.now(),
-        firstName: formFirstName,
-        lastName: formLastName,
-        email: formEmail,
-        role: formRole,
-      }
-
-      setUsers((prev) => [...prev, newUser])
+    const payload = {
+      firstName: formFirstName,
+      lastName: formLastName,
+      email: formEmail,
+      role: formRole,
     }
 
-    setIsFormOpen(false)
+    try {
+      if (editingUser) {
+        const res = await fetch(`http://localhost:5000/users/${editingUser.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+
+        const updated = await res.json()
+
+        setUsers((prev) =>
+          prev.map((u) => (u.id === updated.id ? updated : u))
+        )
+      } else {
+        const res = await fetch("http://localhost:5000/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+
+        const created = await res.json()
+
+        setUsers((prev) => [...prev, created])
+      }
+
+      setIsFormOpen(false)
+    } catch (err) {
+      console.error("Erreur save user:", err)
+    }
+  }
+
+  // ✅ LOADING
+  if (loading) {
+    return <div className="p-4">Chargement...</div>
   }
 
   return (
@@ -114,7 +162,6 @@ export default function UsersPage() {
         </header>
 
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-
           <div className="rounded-xl bg-muted/50 p-4 space-y-4">
 
             <div className="flex justify-between items-center">
@@ -167,17 +214,14 @@ export default function UsersPage() {
               <UserForm
                 open={isFormOpen}
                 editingUser={editingUser}
-
                 formFirstName={formFirstName}
                 formLastName={formLastName}
                 formEmail={formEmail}
                 formRole={formRole}
-
                 setFormFirstName={setFormFirstName}
                 setFormLastName={setFormLastName}
                 setFormEmail={setFormEmail}
                 setFormRole={setFormRole}
-
                 onCancel={() => setIsFormOpen(false)}
                 onSave={handleSaveUser}
               />

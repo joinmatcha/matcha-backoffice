@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { User } from "./data"
@@ -15,6 +16,8 @@ export default function UsersTable({
   onView,
   onEdit,
 }: Props) {
+  const router = useRouter()
+
   return (
     <table className="w-full text-sm">
       <thead>
@@ -46,9 +49,9 @@ export default function UsersTable({
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => onView(user)}
+                onClick={() => router.push(`/dashboard/users/${user.id}`)}
               >
-                Voir
+                Voir résultats
               </Button>
 
               <Button
