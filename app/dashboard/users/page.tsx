@@ -39,8 +39,10 @@ export default function UsersPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch("http://localhost:5000/users")
+        const res = await fetch("http://localhost:3000/api/admin/users")
         const data = await res.json()
+        setUsers(data.data || data) // Adaptation selon structure API
+
         setUsers(data)
       } catch (error) {
         console.error("Erreur fetch users:", error)
@@ -72,27 +74,6 @@ export default function UsersPage() {
     currentPage * USERS_PER_PAGE
   )
 
-  // ✅ DELETE (BACK)
-  const handleDelete = async (id: number) => {
-    try {
-      await fetch(`http://localhost:5000/users/${id}`, {
-        method: "DELETE",
-      })
-
-      setUsers((prev) => prev.filter((u) => u.id !== id))
-    } catch (err) {
-      console.error("Erreur delete:", err)
-    }
-  }
-
-  const openCreateForm = () => {
-    setEditingUser(null)
-    setFormFirstName("")
-    setFormLastName("")
-    setFormEmail("")
-    setFormRole("User")
-    setIsFormOpen(true)
-  }
 
   const openEditForm = (user: User) => {
     setEditingUser(user)
@@ -103,9 +84,9 @@ export default function UsersPage() {
     setIsFormOpen(true)
   }
 
-  // ✅ CREATE + UPDATE (BACK)
+  // UPDATE USER (BACK)
   const handleSaveUser = async () => {
-    if (!formFirstName || !formLastName || !formEmail) return
+    if (!editingUser) return
 
     const payload = {
       firstName: formFirstName,
@@ -115,30 +96,17 @@ export default function UsersPage() {
     }
 
     try {
-      if (editingUser) {
-        const res = await fetch(`http://localhost:5000/users/${editingUser.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
+      const res = await fetch(`http://localhost:3000/api/admin/users/${editingUser.id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify(payload),
         })
 
-        const updated = await res.json()
+      const updated = await res.json()
 
-        setUsers((prev) =>
-          prev.map((u) => (u.id === updated.id ? updated : u))
-        )
-      } else {
-        const res = await fetch("http://localhost:5000/users", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        })
-
-        const created = await res.json()
-
-        setUsers((prev) => [...prev, created])
-      }
-
+      setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)))
       setIsFormOpen(false)
     } catch (err) {
       console.error("Erreur save user:", err)
@@ -172,14 +140,10 @@ export default function UsersPage() {
                 className="max-w-sm"
               />
 
-              <Button onClick={openCreateForm}>
-                Ajouter
-              </Button>
             </div>
 
             <UsersTable
               users={paginatedUsers}
-              onDelete={handleDelete}
               onView={setSelectedUser}
               onEdit={openEditForm}
             />

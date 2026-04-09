@@ -5,14 +5,12 @@ import { User } from "./data"
 
 type Props = {
   users: User[]
-  onDelete: (id: number) => void
   onView: (user: User) => void
   onEdit: (user: User) => void
 }
 
 export default function UsersTable({
   users,
-  onDelete,
   onView,
   onEdit,
 }: Props) {
@@ -62,13 +60,7 @@ export default function UsersTable({
                 Edit
               </Button>
 
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={() => onDelete(user.id)}
-              >
-                Delete
-              </Button>
+            
             </td>
           </tr>
         ))}
