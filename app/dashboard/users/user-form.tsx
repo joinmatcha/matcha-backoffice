@@ -47,7 +47,7 @@ export default function UserForm({
 
         <DialogHeader>
           <DialogTitle>
-            {editingUser ? "Modifier utilisateur" : "Ajouter utilisateur"}
+            Modifier utilisateur
           </DialogTitle>
         </DialogHeader>
 

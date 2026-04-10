@@ -13,18 +13,20 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-import { usersMock, type User } from "./data"
+import { type User } from "./data"
 import UsersTable from "./users-table"
 import UserForm from "./user-form"
 
 const USERS_PER_PAGE = 10
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>(usersMock)
+  // ⚠️ TEMP TOKEN - remove when auth is implemented
+  const TOKEN = process.env.NEXT_PUBLIC_API_TOKEN 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
@@ -33,6 +35,32 @@ export default function UsersPage() {
   const [formLastName, setFormLastName] = useState("")
   const [formEmail, setFormEmail] = useState("")
   const [formRole, setFormRole] = useState<"Admin" | "User">("User")
+
+  useEffect(() => {
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/admin/users`, {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+        },
+      })
+
+      console.log("STATUS:", res.status)
+
+      const data = await res.json()
+      console.log("DATA:", data)
+
+      setUsers(data.items)
+    } catch (error) {
+      console.error("Erreur:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  fetchUsers()
+  }, [])
+
 
   const filteredUsers = useMemo(() => {
     return users.filter(
@@ -54,52 +82,52 @@ export default function UsersPage() {
     currentPage * USERS_PER_PAGE
   )
 
-  const handleDelete = (id: number) => {
-    setUsers((prev) => prev.filter((u) => u.id !== id))
-  }
-
-  const openCreateForm = () => {
-    setEditingUser(null)
-    setFormFirstName("")
-    setFormLastName("")
-    setFormEmail("")
-    setFormRole("User")
-    setIsFormOpen(true)
-  }
-
   const openEditForm = (user: User) => {
     setEditingUser(user)
     setFormFirstName(user.firstName)
     setFormLastName(user.lastName)
     setFormEmail(user.email)
-    setFormRole(user.role)
+    setFormRole(user.role === "admin" ? "Admin" : "User")
     setIsFormOpen(true)
   }
 
-  const handleSaveUser = () => {
-    if (!formFirstName || !formEmail) return
+ const handleSaveUser = async () => {
+  if (!editingUser) return
 
-    if (editingUser) {
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === editingUser.id
-            ? { ...u, firstName: formFirstName, lastName: formLastName, email: formEmail, role: formRole }
-            : u
-        )
-      )
-    } else {
-      const newUser: User = {
-        id: Date.now(),
-        firstName: formFirstName,
-        lastName: formLastName,
-        email: formEmail,
-        role: formRole,
+  try {
+    const res = await fetch(
+      `${API_URL}/api/admin/users/${editingUser._id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`,
+        },
+        body: JSON.stringify({
+          firstName: formFirstName,
+          lastName: formLastName,
+          email: formEmail,
+          role: formRole === "Admin" ? "admin" : "User",
+        }),
       }
+    )
 
-      setUsers((prev) => [...prev, newUser])
-    }
+    const updatedUser = await res.json()
+
+    setUsers((prev) =>
+      prev.map((u) =>
+        u._id === updatedUser._id ? updatedUser : u
+      )
+    )
 
     setIsFormOpen(false)
+  } catch (error) {
+    console.error("Erreur update:", error)
+  }
+}
+
+  if (loading) {
+    return <div className="p-4">Chargement...</div>
   }
 
   return (
@@ -124,16 +152,10 @@ export default function UsersPage() {
                 onChange={(e) => setSearch(e.target.value)}
                 className="max-w-sm"
               />
-
-              <Button onClick={openCreateForm}>
-                Ajouter
-              </Button>
             </div>
 
             <UsersTable
               users={paginatedUsers}
-              onDelete={handleDelete}
-              onView={setSelectedUser}
               onEdit={openEditForm}
             />
 
@@ -182,33 +204,8 @@ export default function UsersPage() {
                 onSave={handleSaveUser}
               />
             )}
-
-            {selectedUser && (
-              <div className="rounded-lg border bg-background p-4 mt-6">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-sm font-semibold">
-                    Détails utilisateur
-                  </h2>
-
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setSelectedUser(null)}
-                  >
-                    Fermer
-                  </Button>
-                </div>
-
-                <div className="mt-4 space-y-2 text-sm">
-                  <p><strong>Prénom:</strong> {selectedUser.firstName}</p>
-                  <p><strong>Nom:</strong> {selectedUser.lastName}</p>
-                  <p><strong>Email:</strong> {selectedUser.email}</p>
-                  <p><strong>Rôle:</strong> {selectedUser.role}</p>
-                </div>
-              </div>
-            )}
-
           </div>
+        
         </div>
       </SidebarInset>
     </SidebarProvider>

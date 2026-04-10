@@ -4,15 +4,11 @@ import { User } from "./data"
 
 type Props = {
   users: User[]
-  onDelete: (id: number) => void
-  onView: (user: User) => void
   onEdit: (user: User) => void
 }
 
 export default function UsersTable({
   users,
-  onDelete,
-  onView,
   onEdit,
 }: Props) {
   return (
@@ -29,42 +25,27 @@ export default function UsersTable({
 
       <tbody>
         {users.map((user) => (
-          <tr key={user.id} className="border-b">
+          <tr key={user._id} className="border-b">
             <td className="py-2">{user.firstName}</td>
             <td className="py-2">{user.lastName}</td>
             <td>{user.email}</td>
 
             <td>
               <Badge
-                variant={user.role === "Admin" ? "default" : "secondary"}
+                variant={user.role === "admin" ? "default" : "secondary"}
               >
                 {user.role}
               </Badge>
             </td>
 
             <td className="space-x-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => onView(user)}
-              >
-                Voir
-              </Button>
 
               <Button
                 size="sm"
-                variant="secondary"
+                className="bg-black text-white hover:bg-black/80"
                 onClick={() => onEdit(user)}
               >
-                Edit
-              </Button>
-
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={() => onDelete(user.id)}
-              >
-                Delete
+                Modifier
               </Button>
             </td>
           </tr>
