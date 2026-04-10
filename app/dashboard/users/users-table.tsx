@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { User } from "./data"
+import { User } from "@/app/types/user"
 
 type Props = {
   users: User[]

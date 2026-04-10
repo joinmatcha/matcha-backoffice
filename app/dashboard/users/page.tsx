@@ -13,7 +13,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-import { type User } from "./data"
+import { User } from "@/app/types/user"
 import UsersTable from "./users-table"
 import UserForm from "./user-form"
 
