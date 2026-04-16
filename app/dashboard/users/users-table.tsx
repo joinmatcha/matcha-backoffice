@@ -1,20 +1,21 @@
+import { useRouter } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { User } from "./data"
 
 type Props = {
   users: User[]
-  onDelete: (id: number) => void
   onView: (user: User) => void
   onEdit: (user: User) => void
 }
 
 export default function UsersTable({
   users,
-  onDelete,
   onView,
   onEdit,
 }: Props) {
+  const router = useRouter()
+
   return (
     <table className="w-full text-sm">
       <thead>
@@ -46,9 +47,9 @@ export default function UsersTable({
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => onView(user)}
+                onClick={() => router.push(`/dashboard/users/${user.id}`)}
               >
-                Voir
+                Voir résultats
               </Button>
 
               <Button
@@ -59,13 +60,7 @@ export default function UsersTable({
                 Edit
               </Button>
 
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={() => onDelete(user.id)}
-              >
-                Delete
-              </Button>
+            
             </td>
           </tr>
         ))}
