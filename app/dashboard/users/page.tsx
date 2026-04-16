@@ -38,6 +38,13 @@ export default function UsersPage() {
 
   useEffect(() => {
   const fetchUsers = async () => {
+
+    if (!API_URL || !TOKEN) {
+      console.error("API_URL ou TOKEN manquant")
+      setLoading(false)
+      return
+    }
+
     try {
       const res = await fetch(`${API_URL}/api/admin/users`, {
         headers: {
@@ -50,6 +57,19 @@ export default function UsersPage() {
       const data = await res.json()
       console.log("DATA:", data)
 
+      //Gérer les erreurs HTTP avant tentative d'accès à data.items pour éviter les erreurs de type "Cannot read properties of undefined"
+      if (!res.ok) {
+        console.error("Erreur API:", res.status, data)
+        setUsers([])
+        return
+      }
+      // Vérifier que data.items existe et est un tableau
+      if (!data.items || !Array.isArray(data.items)) {
+        console.error("Format API invalide", data)
+        setUsers([])
+        return
+      }
+      // Cas normal
       setUsers(data.items)
     } catch (error) {
       console.error("Erreur:", error)
