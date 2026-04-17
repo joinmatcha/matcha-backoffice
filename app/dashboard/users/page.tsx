@@ -13,14 +13,15 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-import { usersMock, type User } from "./data"
 import UsersTable from "./users-table"
 import UserForm from "./user-form"
+import type { User } from "./data"
 
 const USERS_PER_PAGE = 10
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>(usersMock)
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -33,6 +34,25 @@ export default function UsersPage() {
   const [formLastName, setFormLastName] = useState("")
   const [formEmail, setFormEmail] = useState("")
   const [formRole, setFormRole] = useState<"Admin" | "User">("User")
+
+  // ✅ FETCH USERS (BACK)
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/admin/users")
+        const data = await res.json()
+        setUsers(data.data || data) // Adaptation selon structure API
+
+        setUsers(data)
+      } catch (error) {
+        console.error("Erreur fetch users:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchUsers()
+  }, [])
 
   const filteredUsers = useMemo(() => {
     return users.filter(
@@ -54,18 +74,6 @@ export default function UsersPage() {
     currentPage * USERS_PER_PAGE
   )
 
-  const handleDelete = (id: number) => {
-    setUsers((prev) => prev.filter((u) => u.id !== id))
-  }
-
-  const openCreateForm = () => {
-    setEditingUser(null)
-    setFormFirstName("")
-    setFormLastName("")
-    setFormEmail("")
-    setFormRole("User")
-    setIsFormOpen(true)
-  }
 
   const openEditForm = (user: User) => {
     setEditingUser(user)
@@ -76,30 +84,38 @@ export default function UsersPage() {
     setIsFormOpen(true)
   }
 
-  const handleSaveUser = () => {
-    if (!formFirstName || !formEmail) return
+  // UPDATE USER (BACK)
+  const handleSaveUser = async () => {
+    if (!editingUser) return
 
-    if (editingUser) {
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === editingUser.id
-            ? { ...u, firstName: formFirstName, lastName: formLastName, email: formEmail, role: formRole }
-            : u
-        )
-      )
-    } else {
-      const newUser: User = {
-        id: Date.now(),
-        firstName: formFirstName,
-        lastName: formLastName,
-        email: formEmail,
-        role: formRole,
-      }
-
-      setUsers((prev) => [...prev, newUser])
+    const payload = {
+      firstName: formFirstName,
+      lastName: formLastName,
+      email: formEmail,
+      role: formRole,
     }
 
-    setIsFormOpen(false)
+    try {
+      const res = await fetch(`http://localhost:3000/api/admin/users/${editingUser.id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        })
+
+      const updated = await res.json()
+
+      setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)))
+      setIsFormOpen(false)
+    } catch (err) {
+      console.error("Erreur save user:", err)
+    }
+  }
+
+  // ✅ LOADING
+  if (loading) {
+    return <div className="p-4">Chargement...</div>
   }
 
   return (
@@ -114,7 +130,6 @@ export default function UsersPage() {
         </header>
 
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-
           <div className="rounded-xl bg-muted/50 p-4 space-y-4">
 
             <div className="flex justify-between items-center">
@@ -125,14 +140,10 @@ export default function UsersPage() {
                 className="max-w-sm"
               />
 
-              <Button onClick={openCreateForm}>
-                Ajouter
-              </Button>
             </div>
 
             <UsersTable
               users={paginatedUsers}
-              onDelete={handleDelete}
               onView={setSelectedUser}
               onEdit={openEditForm}
             />
@@ -167,17 +178,14 @@ export default function UsersPage() {
               <UserForm
                 open={isFormOpen}
                 editingUser={editingUser}
-
                 formFirstName={formFirstName}
                 formLastName={formLastName}
                 formEmail={formEmail}
                 formRole={formRole}
-
                 setFormFirstName={setFormFirstName}
                 setFormLastName={setFormLastName}
                 setFormEmail={setFormEmail}
                 setFormRole={setFormRole}
-
                 onCancel={() => setIsFormOpen(false)}
                 onSave={handleSaveUser}
               />
