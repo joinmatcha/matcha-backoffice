@@ -1,19 +1,14 @@
 import { useRouter } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { User } from "./data"
+import type { User } from "@/app/types/user"
 
 type Props = {
   users: User[]
-  onView: (user: User) => void
   onEdit: (user: User) => void
 }
 
-export default function UsersTable({
-  users,
-  onView,
-  onEdit,
-}: Props) {
+export default function UsersTable({ users, onEdit }: Props) {
   const router = useRouter()
 
   return (
@@ -30,37 +25,26 @@ export default function UsersTable({
 
       <tbody>
         {users.map((user) => (
-          <tr key={user.id} className="border-b">
+          <tr key={user._id} className="border-b">
             <td className="py-2">{user.firstName}</td>
             <td className="py-2">{user.lastName}</td>
             <td>{user.email}</td>
 
             <td>
-              <Badge
-                variant={user.role === "Admin" ? "default" : "secondary"}
-              >
+              <Badge variant={user.role === "admin" ? "default" : "secondary"}>
                 {user.role}
               </Badge>
             </td>
 
             <td className="space-x-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => router.push(`/dashboard/users/${user.id}`)}
-              >
-                Voir résultats
-              </Button>
 
               <Button
                 size="sm"
-                variant="secondary"
+                className="!bg-[#8BC48A] text-white hover:bg-[#7ab77a]"
                 onClick={() => onEdit(user)}
               >
-                Edit
+                Modifier
               </Button>
-
-            
             </td>
           </tr>
         ))}

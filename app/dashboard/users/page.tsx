@@ -13,19 +13,20 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
+import { User } from "@/app/types/user"
 import UsersTable from "./users-table"
 import UserForm from "./user-form"
-import type { User } from "./data"
 
 const USERS_PER_PAGE = 10
 
 export default function UsersPage() {
+  // ⚠️ TEMP TOKEN - remove when auth is implemented
+  const TOKEN = process.env.NEXT_PUBLIC_API_TOKEN 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
@@ -33,26 +34,53 @@ export default function UsersPage() {
   const [formFirstName, setFormFirstName] = useState("")
   const [formLastName, setFormLastName] = useState("")
   const [formEmail, setFormEmail] = useState("")
-  const [formRole, setFormRole] = useState<"Admin" | "User">("User")
+  const [formRole, setFormRole] = useState<"admin" | "user">("user")
 
-  // ✅ FETCH USERS (BACK)
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await fetch("http://localhost:3000/api/admin/users")
-        const data = await res.json()
-        setUsers(data.data || data) // Adaptation selon structure API
+  const fetchUsers = async () => {
 
-        setUsers(data)
-      } catch (error) {
-        console.error("Erreur fetch users:", error)
-      } finally {
-        setLoading(false)
-      }
+    if (!API_URL || !TOKEN) {
+      console.error("API_URL ou TOKEN manquant")
+      setLoading(false)
+      return
     }
 
-    fetchUsers()
+    try {
+      const res = await fetch(`${API_URL}/api/admin/users`, {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+        },
+      })
+
+      console.log("STATUS:", res.status)
+
+      const data = await res.json()
+      console.log("DATA:", data)
+
+      //Gérer les erreurs HTTP avant tentative d'accès à data.items pour éviter les erreurs de type "Cannot read properties of undefined"
+      if (!res.ok) {
+        console.error("Erreur API:", res.status, data)
+        setUsers([])
+        return
+      }
+      // Vérifier que data.items existe et est un tableau
+      if (!data.items || !Array.isArray(data.items)) {
+        console.error("Format API invalide", data)
+        setUsers([])
+        return
+      }
+      // Cas normal
+      setUsers(data.items)
+    } catch (error) {
+      console.error("Erreur:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  fetchUsers()
   }, [])
+
 
   const filteredUsers = useMemo(() => {
     return users.filter(
@@ -74,46 +102,50 @@ export default function UsersPage() {
     currentPage * USERS_PER_PAGE
   )
 
-
   const openEditForm = (user: User) => {
     setEditingUser(user)
     setFormFirstName(user.firstName)
     setFormLastName(user.lastName)
     setFormEmail(user.email)
-    setFormRole(user.role)
+    setFormRole(user.role === "admin" ? "admin" : "user")
     setIsFormOpen(true)
   }
 
-  // UPDATE USER (BACK)
-  const handleSaveUser = async () => {
-    if (!editingUser) return
+ const handleSaveUser = async () => {
+  if (!editingUser) return
 
-    const payload = {
-      firstName: formFirstName,
-      lastName: formLastName,
-      email: formEmail,
-      role: formRole,
-    }
+  try {
+    const res = await fetch(
+      `${API_URL}/api/admin/users/${editingUser._id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`,
+        },
+        body: JSON.stringify({
+          firstName: formFirstName,
+          lastName: formLastName,
+          email: formEmail,
+          role: formRole === "admin" ? "admin" : "user",
+        }),
+      }
+    )
 
-    try {
-      const res = await fetch(`http://localhost:3000/api/admin/users/${editingUser.id}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        })
+    const updatedUser = await res.json()
 
-      const updated = await res.json()
+    setUsers((prev) =>
+      prev.map((u) =>
+        u._id === updatedUser._id ? updatedUser : u
+      )
+    )
 
-      setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)))
-      setIsFormOpen(false)
-    } catch (err) {
-      console.error("Erreur save user:", err)
-    }
+    setIsFormOpen(false)
+  } catch (error) {
+    console.error("Erreur update:", error)
   }
+}
 
-  // ✅ LOADING
   if (loading) {
     return <div className="p-4">Chargement...</div>
   }
@@ -139,12 +171,10 @@ export default function UsersPage() {
                 onChange={(e) => setSearch(e.target.value)}
                 className="max-w-sm"
               />
-
             </div>
 
             <UsersTable
               users={paginatedUsers}
-              onView={setSelectedUser}
               onEdit={openEditForm}
             />
 
@@ -190,33 +220,8 @@ export default function UsersPage() {
                 onSave={handleSaveUser}
               />
             )}
-
-            {selectedUser && (
-              <div className="rounded-lg border bg-background p-4 mt-6">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-sm font-semibold">
-                    Détails utilisateur
-                  </h2>
-
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setSelectedUser(null)}
-                  >
-                    Fermer
-                  </Button>
-                </div>
-
-                <div className="mt-4 space-y-2 text-sm">
-                  <p><strong>Prénom:</strong> {selectedUser.firstName}</p>
-                  <p><strong>Nom:</strong> {selectedUser.lastName}</p>
-                  <p><strong>Email:</strong> {selectedUser.email}</p>
-                  <p><strong>Rôle:</strong> {selectedUser.role}</p>
-                </div>
-              </div>
-            )}
-
           </div>
+        
         </div>
       </SidebarInset>
     </SidebarProvider>

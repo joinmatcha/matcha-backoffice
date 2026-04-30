@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { resultsMock } from "../results"
-import type { User } from "../data"
+import type { User } from "../../../types/user"
 
 export default function UserDetailPage() {
   const params = useParams()
