@@ -42,7 +42,7 @@ export default function UsersTable({
 
               <Button
                 size="sm"
-                className="bg-black text-white hover:bg-black/80"
+                className="!bg-[#8BC48A] text-white hover:bg-[#7ab77a]"
                 onClick={() => onEdit(user)}
               >
                 Modifier
