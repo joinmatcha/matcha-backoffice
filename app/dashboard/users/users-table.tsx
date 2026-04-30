@@ -1,16 +1,16 @@
+import { useRouter } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { User } from "@/app/types/user"
+import type { User } from "@/app/types/user"
 
 type Props = {
   users: User[]
   onEdit: (user: User) => void
 }
 
-export default function UsersTable({
-  users,
-  onEdit,
-}: Props) {
+export default function UsersTable({ users, onEdit }: Props) {
+  const router = useRouter()
+
   return (
     <table className="w-full text-sm">
       <thead>
@@ -31,9 +31,7 @@ export default function UsersTable({
             <td>{user.email}</td>
 
             <td>
-              <Badge
-                variant={user.role === "admin" ? "default" : "secondary"}
-              >
+              <Badge variant={user.role === "admin" ? "default" : "secondary"}>
                 {user.role}
               </Badge>
             </td>

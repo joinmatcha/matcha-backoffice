@@ -34,7 +34,7 @@ export default function UsersPage() {
   const [formFirstName, setFormFirstName] = useState("")
   const [formLastName, setFormLastName] = useState("")
   const [formEmail, setFormEmail] = useState("")
-  const [formRole, setFormRole] = useState<"Admin" | "User">("User")
+  const [formRole, setFormRole] = useState<"admin" | "user">("user")
 
   useEffect(() => {
   const fetchUsers = async () => {
@@ -107,7 +107,7 @@ export default function UsersPage() {
     setFormFirstName(user.firstName)
     setFormLastName(user.lastName)
     setFormEmail(user.email)
-    setFormRole(user.role === "admin" ? "Admin" : "User")
+    setFormRole(user.role === "admin" ? "admin" : "user")
     setIsFormOpen(true)
   }
 
@@ -127,7 +127,7 @@ export default function UsersPage() {
           firstName: formFirstName,
           lastName: formLastName,
           email: formEmail,
-          role: formRole === "Admin" ? "admin" : "User",
+          role: formRole === "admin" ? "admin" : "user",
         }),
       }
     )
@@ -162,7 +162,6 @@ export default function UsersPage() {
         </header>
 
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-
           <div className="rounded-xl bg-muted/50 p-4 space-y-4">
 
             <div className="flex justify-between items-center">
@@ -209,17 +208,14 @@ export default function UsersPage() {
               <UserForm
                 open={isFormOpen}
                 editingUser={editingUser}
-
                 formFirstName={formFirstName}
                 formLastName={formLastName}
                 formEmail={formEmail}
                 formRole={formRole}
-
                 setFormFirstName={setFormFirstName}
                 setFormLastName={setFormLastName}
                 setFormEmail={setFormEmail}
                 setFormRole={setFormRole}
-
                 onCancel={() => setIsFormOpen(false)}
                 onSave={handleSaveUser}
               />

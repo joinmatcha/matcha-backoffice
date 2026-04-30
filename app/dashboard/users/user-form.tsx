@@ -10,7 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 
-import { User } from "./data"
+import type { User } from "../../types/user"
 
 type Props = {
   open: boolean
@@ -18,11 +18,11 @@ type Props = {
   formFirstName: string
   formLastName: string
   formEmail: string
-  formRole: "Admin" | "User"
+  formRole: "admin" | "user"
   setFormFirstName: (v: string) => void
   setFormLastName: (v: string) => void
   setFormEmail: (v: string) => void
-  setFormRole: (v: "Admin" | "User") => void
+  setFormRole: (v: "admin" | "user") => void
   onSave: () => void
   onCancel: () => void
 }
@@ -75,11 +75,11 @@ export default function UserForm({
             className="border rounded-md p-2 text-sm w-full"
             value={formRole}
             onChange={(e) =>
-              setFormRole(e.target.value as "Admin" | "User")
+              setFormRole(e.target.value as "admin" | "user")
             }
           >
-            <option value="User">User</option>
-            <option value="Admin">Admin</option>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
           </select>
 
         </div>
