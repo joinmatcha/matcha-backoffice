@@ -161,7 +161,7 @@ export default function UsersPage() {
           <h1 className="text-sm font-medium">Utilisateurs</h1>
         </header>
 
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+        <div className="flex flex-1 flex-col gap-4 px-8 py-6 w-full">
           <div className="rounded-xl bg-muted/50 p-4 space-y-4">
 
             <div className="flex justify-between items-center">

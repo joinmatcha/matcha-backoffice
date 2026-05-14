@@ -25,12 +25,12 @@ export default function UsersTable({ users, onEdit }: Props) {
 
       <tbody>
         {users.map((user) => (
-          <tr key={user._id} className="border-b">
-            <td className="py-2">{user.firstName}</td>
-            <td className="py-2">{user.lastName}</td>
-            <td>{user.email}</td>
+          <tr key={user._id} className="border-b hover:bg-muted/95 transition-colors">
+            <td className="py-3">{user.firstName}</td>
+            <td className="py-3">{user.lastName}</td>
+            <td className="py-3">{user.email}</td>
 
-            <td>
+            <td className="py-3">
               <Badge variant={user.role === "admin" ? "default" : "secondary"}>
                 {user.role}
               </Badge>
@@ -40,7 +40,7 @@ export default function UsersTable({ users, onEdit }: Props) {
 
               <Button
                 size="sm"
-                className="!bg-[#8BC48A] text-white hover:bg-[#7ab77a]"
+                className="!bg-[#334155] text-white hover:bg-[#7ab77a]"
                 onClick={() => onEdit(user)}
               >
                 Modifier
