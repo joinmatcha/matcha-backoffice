@@ -7,8 +7,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-manrope), Arial, Helvetica, sans-serif;
+  --font-display: var(--font-outfit), var(--font-manrope), Arial, Helvetica,
+    sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -83,63 +85,49 @@
 }*/
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0.875rem;
 
-  /* BACKGROUND (crème) */
-  --background: oklch(0.95 0.02 85);
-  --foreground: oklch(0.2 0.02 40);
+  --background: #fbf8f4;
+  --foreground: #0f141c;
 
-  --card: oklch(0.97 0.015 85);
-  --card-foreground: oklch(0.2 0.02 40);
+  --card: rgba(255, 255, 255, 0.95);
+  --card-foreground: #0f141c;
 
-  --popover: oklch(0.97 0.015 85);
-  --popover-foreground: oklch(0.2 0.02 40);
+  --popover: #ffffff;
+  --popover-foreground: #0f141c;
 
-  /* PRIMARY = VERT MATCHA */
-  --primary: oklch(0.7 0.12 140);
-  --primary-foreground: oklch(0.98 0.01 140);
+  --primary: #2a7f68;
+  --primary-foreground: #f7f9fc;
 
-  /* SECONDARY (crème léger) */
-  --secondary: oklch(0.92 0.02 85);
-  --secondary-foreground: oklch(0.2 0.02 40);
+  --secondary: #eff6f1;
+  --secondary-foreground: #0f141c;
 
-  /* MUTED (gris chaud léger) */
-  --muted: oklch(0.9 0.015 85);
-  --muted-foreground: oklch(0.5 0.02 40);
+  --muted: #f1f5f5;
+  --muted-foreground: #5e6a78;
 
-  /* ACCENT (hover / sélection) */
-  --accent: oklch(0.92 0.02 85);
-  --accent-foreground: oklch(0.2 0.02 40);
+  --accent: #e8f2ee;
+  --accent-foreground: #1f6653;
 
-  /* DANGER */
-  --destructive: oklch(0.6 0.2 30);
+  --destructive: #dc2626;
 
-  /* BORDERS / INPUT */
-  --border: oklch(0.88 0.01 85);
-  --input: oklch(0.88 0.01 85);
+  --border: #e7ecef;
+  --input: #dce8e2;
+  --ring: #6db89f;
 
-  /* FOCUS (plus de bleu) */
-  --ring: oklch(0.7 0.12 140);
+  --chart-1: #2a7f68;
+  --chart-2: #8ebba9;
+  --chart-3: #d97745;
+  --chart-4: #edac7b;
+  --chart-5: #215947;
 
-  /* CHARTS (optionnel) */
-  --chart-1: oklch(0.7 0.12 140);
-  --chart-2: oklch(0.75 0.1 120);
-  --chart-3: oklch(0.65 0.08 100);
-  --chart-4: oklch(0.8 0.1 90);
-  --chart-5: oklch(0.75 0.08 70);
-
-  /* SIDEBAR */
-  --sidebar: oklch(0.97 0.015 85);
-  --sidebar-foreground: oklch(0.2 0.02 40);
-
-  --sidebar-primary: oklch(0.7 0.12 140);
-  --sidebar-primary-foreground: oklch(0.98 0.01 140);
-
-  --sidebar-accent: oklch(0.92 0.02 85);
-  --sidebar-accent-foreground: oklch(0.2 0.02 40);
-
-  --sidebar-border: oklch(0.88 0.01 85);
-  --sidebar-ring: oklch(0.7 0.12 140);
+  --sidebar: rgba(255, 253, 249, 0.92);
+  --sidebar-foreground: #1d2530;
+  --sidebar-primary: #2a7f68;
+  --sidebar-primary-foreground: #f7f9fc;
+  --sidebar-accent: #e8f2ee;
+  --sidebar-accent-foreground: #1f6653;
+  --sidebar-border: rgba(42, 127, 104, 0.14);
+  --sidebar-ring: #6db89f;
 }
 
 .dark {
@@ -180,7 +168,37 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
+	  body {
     @apply bg-background text-foreground;
+    background:
+      linear-gradient(112deg, transparent 0 58%, rgba(255, 255, 255, 0.32) 58% 69%, transparent 69% 100%),
+      linear-gradient(18deg, rgba(255, 255, 255, 0.22) 0 16%, transparent 16% 100%),
+      linear-gradient(135deg, #fffdf9 0%, #fcf8f2 50%, #f8f2e8 100%);
+    min-height: 100vh;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-outfit), var(--font-manrope), Arial, Helvetica,
+      sans-serif;
+  }
+}
+
+@layer components {
+  .matcha-card {
+    @apply rounded-[22px] border border-white/80 bg-card text-card-foreground shadow-[0_8px_22px_rgba(13,21,32,0.07)];
+  }
+
+  .matcha-panel {
+    @apply rounded-[20px] border border-border/80 bg-white/80 shadow-[0_6px_18px_rgba(13,21,32,0.045)];
+  }
+
+  .matcha-table {
+    @apply overflow-hidden rounded-[20px] border border-border/80 bg-card shadow-[0_8px_22px_rgba(13,21,32,0.055)];
+  }
+
+  .matcha-page {
+    @apply space-y-5 p-4 md:p-6;
   }
 }
