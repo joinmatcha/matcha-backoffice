@@ -20,8 +20,6 @@ import UserForm from "./user-form"
 const USERS_PER_PAGE = 10
 
 export default function UsersPage() {
-  // ⚠️ TEMP TOKEN - remove when auth is implemented
-  const TOKEN = process.env.NEXT_PUBLIC_API_TOKEN 
   const API_URL = process.env.NEXT_PUBLIC_API_URL
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
@@ -38,9 +36,10 @@ export default function UsersPage() {
 
   useEffect(() => {
   const fetchUsers = async () => {
+      const token = localStorage.getItem("token")
 
-    if (!API_URL || !TOKEN) {
-      console.error("API_URL ou TOKEN manquant")
+    if (!API_URL || !token) {
+      console.error("API_URL ou token manquant")
       setLoading(false)
       return
     }
@@ -48,7 +47,7 @@ export default function UsersPage() {
     try {
       const res = await fetch(`${API_URL}/api/admin/users`, {
         headers: {
-          Authorization: `Bearer ${TOKEN}`,
+          Authorization: `Bearer ${token}`,
         },
       })
 
@@ -114,6 +113,13 @@ export default function UsersPage() {
  const handleSaveUser = async () => {
   if (!editingUser) return
 
+    const token = localStorage.getItem("token")
+
+    if (!API_URL || !token) {
+      console.error("API_URL ou token manquant")
+      return
+    }
+
   try {
     const res = await fetch(
       `${API_URL}/api/admin/users/${editingUser._id}`,
@@ -121,7 +127,7 @@ export default function UsersPage() {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${TOKEN}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           firstName: formFirstName,
