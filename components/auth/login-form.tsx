@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
+import { adminApi } from "@/lib/api/admin"
 
 export default function LoginForm() {
   const [email, setEmail] = useState("")
@@ -11,37 +12,17 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
-  const API_URL = process.env.NEXT_PUBLIC_API_URL
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
-  setLoading(true)
-  setError("")
+    e.preventDefault()
+    setLoading(true)
+    setError("")
 
     try {
-      const res = await fetch(`${API_URL}/api/admin/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        setError(data.message || "Email ou mot de passe incorrect")
-        return
-      }
-
-      localStorage.setItem("token", data.token)
-
-      router.push("/dashboard/users")
-    } catch {
-      setError("Erreur serveur")
+      await adminApi.login(email, password)
+      router.replace("/dashboard")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur serveur")
     } finally {
       setLoading(false)
     }
@@ -49,19 +30,19 @@ export default function LoginForm() {
 
   return (
     <div className="space-y-6">
-
-      {/* Titre */}
       <div className="space-y-2 text-center">
-        <h2 className="text-xl font-semibold">Connexion Admin</h2>
+        <h2 className="text-2xl font-bold text-foreground">Connexion Admin</h2>
+        <p className="text-sm text-muted-foreground">
+          Accès réservé aux comptes administrateurs vérifiés.
+        </p>
       </div>
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
-
         <Input
           type="email"
           placeholder="Email"
           value={email}
+          required
           onChange={(e) => setEmail(e.target.value)}
         />
 
@@ -69,6 +50,7 @@ export default function LoginForm() {
           type="password"
           placeholder="Mot de passe"
           value={password}
+          required
           onChange={(e) => setPassword(e.target.value)}
         />
 
@@ -81,29 +63,11 @@ export default function LoginForm() {
         </Button>
 
         {error && (
-          <p className="text-sm text-red-500 text-center">
+          <p className="text-center text-sm text-destructive">
             {error}
           </p>
         )}
       </form>
-
-      {/* Liens */}
-      <div className="text-sm text-center space-y-2">
-        <p>
-          Besoin d’un compte ?{" "}
-          <span className="text-green-600 cursor-pointer">
-            S’inscrire
-          </span>
-        </p>
-
-        <p>
-          Mot de passe oublié ?{" "}
-          <span className="text-green-600 cursor-pointer">
-            Cliquez ici
-          </span>
-        </p>
-      </div>
-
     </div>
   )
 }

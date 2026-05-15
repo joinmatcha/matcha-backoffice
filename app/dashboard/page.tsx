@@ -1,55 +1,63 @@
-import { AppSidebar } from "@/components/app-sidebar"
+import Link from "next/link"
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar"
+  BriefcaseBusiness,
+  ClipboardList,
+  Sparkles,
+  Users,
+} from "lucide-react"
+import { PageHeader } from "@/components/layout/page-header"
 
 export default function Page() {
+  const cards = [
+    {
+      title: "Utilisateurs",
+      description: "Comptes, rôles, abonnements et vérification email.",
+      href: "/dashboard/users",
+      icon: Users,
+    },
+    {
+      title: "Métiers",
+      description: "Référentiel des fiches métier et statuts de publication.",
+      href: "/dashboard/jobs",
+      icon: BriefcaseBusiness,
+    },
+    {
+      title: "Personnalité",
+      description: "Versions du test, questions et activation.",
+      href: "/dashboard/personality",
+      icon: Sparkles,
+    },
+    {
+      title: "Bilan",
+      description: "Versions et questions du bilan de compétences.",
+      href: "/dashboard/bilan",
+      icon: ClipboardList,
+    },
+  ]
+
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
-            />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Build Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-          </div>
-          <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+    <>
+      <PageHeader
+        title="Vue d'ensemble"
+        description="Accès rapide aux espaces d'administration Matcha."
+      />
+      <main className="grid gap-4 p-4 md:grid-cols-2 md:p-6 xl:grid-cols-4">
+        {cards.map((card) => (
+          <Link
+            key={card.href}
+            href={card.href}
+            className="matcha-card p-5 text-card-foreground transition hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-[0_16px_34px_rgba(13,21,32,0.1)]"
+          >
+            <div className="mb-4 flex size-10 items-center justify-center rounded-2xl bg-accent text-primary">
+              <card.icon className="size-5" />
+            </div>
+            <h2 className="text-lg font-bold">{card.title}</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {card.description}
+            </p>
+          </Link>
+        ))}
+      </main>
+    </>
   )
 }
