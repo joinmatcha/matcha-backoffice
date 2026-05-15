@@ -12,7 +12,7 @@ export default function UserDetailPage() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // ✅ FETCH BACKEND (user)
+  // FETCH BACKEND (user)
   useEffect(() => {
     const fetchUser = async () => {
       try {
