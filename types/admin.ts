@@ -3,6 +3,17 @@ export type Subscription = "free" | "premium"
 export type Gender = "male" | "female" | "other" | "undisclosed"
 export type LocationPreference = "remote" | "hybrid" | "on-site"
 export type VersionStatus = "draft" | "active" | "archived"
+export type SupportRequestCategory =
+  | "account"
+  | "privacy"
+  | "billing"
+  | "bug"
+  | "other"
+export type SupportRequestStatus =
+  | "open"
+  | "in_progress"
+  | "resolved"
+  | "closed"
 export type PersonalityDimension = "EI" | "SN" | "TF" | "JP"
 export type BilanQuestionDomain =
   | "experience"
@@ -111,6 +122,26 @@ export type AdminUserDetail = {
     total: number
   }
 }
+
+export type SupportRequest = {
+  _id: string
+  user: string
+  email: string
+  name: string
+  category: SupportRequestCategory
+  subject: string
+  message: string
+  status: SupportRequestStatus
+  adminNotes?: string
+  handledBy?: string
+  handledAt?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type SupportRequestUpdate = Partial<
+  Pick<SupportRequest, "status" | "adminNotes">
+>
 
 export type AdminStats = {
   users: {

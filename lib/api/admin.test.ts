@@ -249,6 +249,19 @@ describe("adminApi", () => {
         url: "http://localhost:3000/api/admin/bilan-questions/bq1",
         method: "PATCH",
       },
+      {
+        call: () => adminApi.listSupportRequests({ status: "open", q: "rgpd" }),
+        url: "http://localhost:3000/api/admin/support-requests?status=open&q=rgpd",
+      },
+      {
+        call: () =>
+          adminApi.updateSupportRequest("sr1", {
+            status: "resolved",
+            adminNotes: "Traité",
+          }),
+        url: "http://localhost:3000/api/admin/support-requests/sr1",
+        method: "PATCH",
+      },
     ]
 
     for (const testCase of cases) {
