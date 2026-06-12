@@ -78,31 +78,54 @@ export function WorkStylePage() {
     [dimension, questionPage, search]
   )
 
-  async function loadData() {
-    setLoading(true)
-    setError("")
-    try {
-      const [versionResponse, questionResponse] = await Promise.all([
-        adminApi.listWorkStyleVersions(versionQuery),
-        adminApi.listWorkStyleQuestions(questionQuery),
-      ])
-      setVersions(versionResponse.items)
-      setVersionPagination(versionResponse.pagination)
-      setQuestions(questionResponse.items)
-      setQuestionPagination(questionResponse.pagination)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Chargement impossible")
-      setVersions([])
-      setQuestions([])
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
-    loadData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let ignore = false
+
+    async function loadWorkStyle() {
+      setLoading(true)
+      setError("")
+
+      try {
+        const [versionResponse, questionResponse] = await Promise.all([
+          adminApi.listWorkStyleVersions(versionQuery),
+          adminApi.listWorkStyleQuestions(questionQuery),
+        ])
+
+        if (ignore) return
+        setVersions(versionResponse.items)
+        setVersionPagination(versionResponse.pagination)
+        setQuestions(questionResponse.items)
+        setQuestionPagination(questionResponse.pagination)
+      } catch (err) {
+        if (!ignore) {
+          setError(err instanceof Error ? err.message : "Chargement impossible")
+          setVersions([])
+          setVersionPagination(undefined)
+          setQuestions([])
+          setQuestionPagination(undefined)
+        }
+      } finally {
+        if (!ignore) setLoading(false)
+      }
+    }
+
+    loadWorkStyle()
+
+    return () => {
+      ignore = true
+    }
   }, [versionQuery, questionQuery])
+
+  async function refreshData() {
+    const [versionResponse, questionResponse] = await Promise.all([
+      adminApi.listWorkStyleVersions(versionQuery),
+      adminApi.listWorkStyleQuestions(questionQuery),
+    ])
+    setVersions(versionResponse.items)
+    setVersionPagination(versionResponse.pagination)
+    setQuestions(questionResponse.items)
+    setQuestionPagination(questionResponse.pagination)
+  }
 
   async function saveVersion() {
     setMutating("version")
@@ -124,7 +147,7 @@ export function WorkStylePage() {
       }
       setEditingVersion(null)
       setVersionForm(emptyVersion)
-      await loadData()
+      await refreshData()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Action impossible")
       toast.error("Action impossible")
@@ -155,7 +178,7 @@ export function WorkStylePage() {
       }
       setEditingQuestion(null)
       setQuestionForm(emptyQuestion)
-      await loadData()
+      await refreshData()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Action impossible")
       toast.error("Action impossible")
