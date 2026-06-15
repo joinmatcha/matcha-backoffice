@@ -33,7 +33,7 @@ describe("adminApi", () => {
     await adminApi.login("admin@test.dev", "secret")
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "http://localhost:3000/api/admin/auth/login",
+      "/api/auth/login",
       expect.objectContaining({
         method: "POST",
         credentials: "include",
@@ -109,7 +109,7 @@ describe("adminApi", () => {
     }> = [
       {
         call: () => adminApi.logout(),
-        url: "http://localhost:3000/api/admin/auth/logout",
+        url: "/api/auth/logout",
         method: "POST",
       },
       {
