@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   LifeBuoy,
   Sparkles,
+  SlidersHorizontal,
   Users,
 } from "lucide-react"
 import { AccountMenu } from "@/components/layout/account-menu"
@@ -32,6 +33,11 @@ const navItems = [
   { title: "Métiers", url: "/dashboard/jobs", icon: BriefcaseBusiness },
   { title: "Personnalité", url: "/dashboard/personality", icon: Sparkles },
   { title: "Bilan", url: "/dashboard/bilan", icon: ClipboardList },
+  {
+    title: "Style professionnel",
+    url: "/dashboard/work-style",
+    icon: SlidersHorizontal,
+  },
   { title: "Support", url: "/dashboard/support", icon: LifeBuoy },
   { title: "Statistiques", url: "/dashboard/stats", icon: BarChart3 },
 ]

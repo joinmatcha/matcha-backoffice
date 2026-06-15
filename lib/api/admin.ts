@@ -5,6 +5,7 @@ import { adminPersonalityApi } from "@/lib/api/admin-personality"
 import { adminRomeApi } from "@/lib/api/admin-rome"
 import { adminSupportApi } from "@/lib/api/admin-support"
 import { adminUsersApi } from "@/lib/api/admin-users"
+import { adminWorkStyleApi } from "@/lib/api/admin-work-style"
 
 export const adminApi = {
   ...adminAuthApi,
@@ -13,4 +14,5 @@ export const adminApi = {
   ...adminPersonalityApi,
   ...adminBilanApi,
   ...adminSupportApi,
+  ...adminWorkStyleApi,
 }

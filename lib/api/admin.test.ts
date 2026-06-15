@@ -262,6 +262,59 @@ describe("adminApi", () => {
         url: "http://localhost:3000/api/admin/support-requests/sr1",
         method: "PATCH",
       },
+      {
+        call: () => adminApi.listWorkStyleVersions({ status: "active" }),
+        url: "http://localhost:3000/api/admin/work-style-versions?status=active",
+      },
+      {
+        call: () =>
+          adminApi.createWorkStyleVersion({
+            version: 1,
+            title: "Style V1",
+          }),
+        url: "http://localhost:3000/api/admin/work-style-versions",
+        method: "POST",
+      },
+      {
+        call: () => adminApi.updateWorkStyleVersion(1, { title: "Style V2" }),
+        url: "http://localhost:3000/api/admin/work-style-versions/1",
+        method: "PATCH",
+      },
+      {
+        call: () => adminApi.duplicateWorkStyleVersion(1, { version: 2 }),
+        url: "http://localhost:3000/api/admin/work-style-versions/1/duplicate",
+        method: "POST",
+      },
+      {
+        call: () => adminApi.activateWorkStyleVersion(1),
+        url: "http://localhost:3000/api/admin/work-style-versions/1/activate",
+        method: "POST",
+      },
+      {
+        call: () => adminApi.deactivateWorkStyleVersion(1),
+        url: "http://localhost:3000/api/admin/work-style-versions/1/deactivate",
+        method: "POST",
+      },
+      {
+        call: () => adminApi.listWorkStyleQuestions({ dimension: "autonomy" }),
+        url: "http://localhost:3000/api/admin/work-style-questions?dimension=autonomy",
+      },
+      {
+        call: () =>
+          adminApi.createWorkStyleQuestion({
+            code: "AUT_1",
+            text: "Question",
+            dimension: "autonomy",
+            version: 1,
+          }),
+        url: "http://localhost:3000/api/admin/work-style-questions",
+        method: "POST",
+      },
+      {
+        call: () => adminApi.updateWorkStyleQuestion("wq1", { text: "Question 2" }),
+        url: "http://localhost:3000/api/admin/work-style-questions/wq1",
+        method: "PATCH",
+      },
     ]
 
     for (const testCase of cases) {

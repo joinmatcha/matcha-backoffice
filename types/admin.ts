@@ -23,6 +23,15 @@ export type BilanQuestionDomain =
   | "work_condition"
   | "interest"
 export type BilanQuestionType = "likert_1_5" | "open_text"
+export type WorkStyleDimension =
+  | "autonomy"
+  | "collaboration"
+  | "pace"
+  | "structure"
+  | "variety"
+  | "human_contact"
+  | "mobility"
+  | "learning"
 
 export type Pagination = {
   page: number
@@ -364,6 +373,66 @@ export type BilanQuestionPayload = {
   subdomain?: string | null
   question: string
   type: BilanQuestionType
+  version: number
+  isActive?: boolean
+}
+
+export type WorkStyleProfile = {
+  key: string
+  title: string
+  description: string
+  strengths: string[]
+  cautions: string[]
+  advice: string[]
+  preferredAxes: WorkStyleDimension[]
+}
+
+export type WorkStyleVersion = {
+  _id: string
+  version: number
+  title: string
+  summary?: string
+  status: VersionStatus
+  isActive: boolean
+  profiles: WorkStyleProfile[]
+  createdAt: string
+  updatedAt: string
+}
+
+export type WorkStyleVersionPayload = {
+  version: number
+  title: string
+  summary?: string
+  status?: VersionStatus
+  isActive?: boolean
+  profiles?: WorkStyleProfile[]
+}
+
+export type WorkStyleVersionDuplicate = {
+  version: number
+  title?: string
+  summary?: string
+}
+
+export type WorkStyleQuestion = {
+  _id: string
+  code: string
+  text: string
+  dimension: WorkStyleDimension
+  polarity: 1 | -1
+  order: number
+  version: number
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export type WorkStyleQuestionPayload = {
+  code: string
+  text: string
+  dimension: WorkStyleDimension
+  polarity?: 1 | -1
+  order?: number
   version: number
   isActive?: boolean
 }
