@@ -117,6 +117,26 @@ describe("adminApi", () => {
         url: "http://localhost:3000/api/admin/stats",
       },
       {
+        call: () => adminApi.getInsightsOverview({ limit: 5 }),
+        url: "http://localhost:3000/api/admin/insights/overview?limit=5",
+      },
+      {
+        call: () => adminApi.getInsightsActivity({ from: "2026-06-01" }),
+        url: "http://localhost:3000/api/admin/insights/activity?from=2026-06-01",
+      },
+      {
+        call: () => adminApi.getInsightsTests(),
+        url: "http://localhost:3000/api/admin/insights/tests",
+      },
+      {
+        call: () => adminApi.getInsightsJobs({ limit: 3 }),
+        url: "http://localhost:3000/api/admin/insights/jobs?limit=3",
+      },
+      {
+        call: () => adminApi.getInsightsOrientation(),
+        url: "http://localhost:3000/api/admin/insights/orientation",
+      },
+      {
         call: () => adminApi.getUser("u1"),
         url: "http://localhost:3000/api/admin/users/u1",
       },

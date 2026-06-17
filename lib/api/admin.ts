@@ -1,6 +1,7 @@
 export { ApiError } from "@/lib/api/client"
 import { adminAuthApi } from "@/lib/api/admin-auth"
 import { adminBilanApi } from "@/lib/api/admin-bilan"
+import { adminInsightsApi } from "@/lib/api/admin-insights"
 import { adminPersonalityApi } from "@/lib/api/admin-personality"
 import { adminRomeApi } from "@/lib/api/admin-rome"
 import { adminSupportApi } from "@/lib/api/admin-support"
@@ -11,6 +12,7 @@ export const adminApi = {
   ...adminAuthApi,
   ...adminUsersApi,
   ...adminRomeApi,
+  ...adminInsightsApi,
   ...adminPersonalityApi,
   ...adminBilanApi,
   ...adminSupportApi,
