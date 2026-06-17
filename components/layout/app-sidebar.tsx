@@ -8,6 +8,7 @@ import {
   BarChart3,
   BriefcaseBusiness,
   ClipboardList,
+  Gauge,
   LayoutDashboard,
   LifeBuoy,
   Sparkles,
@@ -39,6 +40,10 @@ const navItems = [
     icon: SlidersHorizontal,
   },
   { title: "Support", url: "/dashboard/support", icon: LifeBuoy },
+]
+
+const steeringItems = [
+  { title: "Matcha Insights", url: "/dashboard/insights", icon: Gauge },
   { title: "Statistiques", url: "/dashboard/stats", icon: BarChart3 },
 ]
 
@@ -71,6 +76,35 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupLabel>
           <SidebarMenu>
             {navItems.map((item) => {
+              const isActive =
+                pathname === item.url ||
+                (item.url !== "/dashboard" && pathname.startsWith(item.url))
+
+              return (
+                <SidebarMenuItem key={item.url}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive}
+                    size="lg"
+                    tooltip={item.title}
+                  >
+                    <Link href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )
+            })}
+          </SidebarMenu>
+        </SidebarGroup>
+
+        <SidebarGroup className="px-3">
+          <SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-normal text-muted-foreground">
+            Pilotage
+          </SidebarGroupLabel>
+          <SidebarMenu>
+            {steeringItems.map((item) => {
               const isActive =
                 pathname === item.url ||
                 (item.url !== "/dashboard" && pathname.startsWith(item.url))
