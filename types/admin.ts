@@ -436,3 +436,84 @@ export type WorkStyleQuestionPayload = {
   version: number
   isActive?: boolean
 }
+
+export type InsightsQuery = {
+  from?: string
+  to?: string
+  limit?: number
+}
+
+export type InsightsOverview = {
+  totalEvents: number
+  activeUsers: number
+  testsStarted: number
+  testsCompleted: number
+  completionRate: number
+  jobViews: number
+  likes: number
+  dislikes: number
+}
+
+export type InsightsActivityPoint = {
+  day: string
+  events: number
+  activeUsers: number
+  testsCompleted: number
+}
+
+export type InsightsTestMetric = {
+  entityType: "personality" | "bilan" | "work_style"
+  label: string
+  started: number
+  completed: number
+  abandoned: number
+  completionRate: number
+  abandonmentRate: number
+  topAbandonStep: null | {
+    stepId: string | null
+    count: number
+  }
+}
+
+export type InsightsJobMetric = {
+  jobId: string
+  title: string
+  domain: string
+  count: number
+}
+
+export type InsightsDomainMetric = {
+  domain: string
+  count: number
+}
+
+export type InsightsJobs = {
+  matched: InsightsJobMetric[]
+  viewed: InsightsJobMetric[]
+  liked: InsightsJobMetric[]
+  disliked: InsightsJobMetric[]
+  domains: {
+    matched: InsightsDomainMetric[]
+    liked: InsightsDomainMetric[]
+  }
+  recommendationInterestGap: InsightsJobMetric[]
+}
+
+export type InsightsOrientationItem = {
+  key: string
+  count: number
+}
+
+export type InsightsWorkStyleProfileItem = InsightsOrientationItem & {
+  title: string
+}
+
+export type InsightsOrientation = {
+  competenceStrengths: InsightsOrientationItem[]
+  competenceToImprove: InsightsOrientationItem[]
+  softSkillStrengths: InsightsOrientationItem[]
+  values: InsightsOrientationItem[]
+  workConditions: InsightsOrientationItem[]
+  workStyleAxes: InsightsOrientationItem[]
+  workStyleProfiles: InsightsWorkStyleProfileItem[]
+}
