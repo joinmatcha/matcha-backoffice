@@ -15,36 +15,17 @@ export class ApiError extends Error {
   }
 }
 
-function getApiBaseUrl() {
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL
-  }
-
-  const protocol = process.env.NEXT_PUBLIC_API_PROTOCOL ?? "http"
-  const host = process.env.NEXT_PUBLIC_API_HOST
-  const port = process.env.NEXT_PUBLIC_API_PORT
-
-  if (!host || !port) return null
-
-  return `${protocol}://${host}:${port}`
-}
-
 function buildUrl(path: string, query?: Record<string, QueryValue>) {
-  const apiBaseUrl = getApiBaseUrl()
-
-  if (!apiBaseUrl) {
-    throw new ApiError("Configuration API manquante")
-  }
-
-  const url = new URL(path, apiBaseUrl)
+  const params = new URLSearchParams()
 
   Object.entries(query ?? {}).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== "") {
-      url.searchParams.set(key, String(value))
+      params.set(key, String(value))
     }
   })
 
-  return url.toString()
+  const qs = params.toString()
+  return qs ? `${path}?${qs}` : path
 }
 
 export async function request<T>(path: string, options: RequestOptions = {}) {
