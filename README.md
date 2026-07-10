@@ -186,6 +186,33 @@ côté `vercel.app`.
 | `POST /api/auth/login` | Proxy login → pose le cookie sur vercel.app      |
 | `POST /api/auth/logout`| Supprime le cookie admin_token sur vercel.app    |
 
+### Proxy des appels admin
+
+Toutes les requêtes vers l'API depuis les pages `/dashboard/*` passent par un
+catch-all Next.js : `app/api/admin/[...path]/route.ts`.
+
+```
+Navigateur → /api/admin/insights/overview (Next.js, vercel.app)
+               → lit le cookie admin_token (httpOnly, non lisible côté client)
+               → GET /api/admin/insights/overview (API, onrender.com)
+                 Authorization: Bearer <token>
+               ← réponse relayée telle quelle au navigateur
+```
+
+Ce proxy :
+
+- lit le cookie `admin_token` côté serveur (le client ne le voit jamais) ;
+- renvoie `401 Missing authentication token` si le cookie est absent, **avant**
+  même d'appeler l'API ;
+- ajoute le header `Authorization: Bearer <token>` sur l'appel vers l'API réelle ;
+- construit l'URL de l'API cible via `NEXT_PUBLIC_API_URL` (ou
+  `NEXT_PUBLIC_API_PROTOCOL`/`HOST`/`PORT` en fallback).
+
+Concrètement, `lib/api/client.ts` (utilisé par tous les modules `lib/api/admin-*.ts`)
+n'appelle jamais l'API externe directement : il fait toujours un `fetch` en
+chemin relatif (`/api/admin/...`), avec `credentials: "include"` pour que le
+cookie `admin_token` soit envoyé au proxy Next — jamais à `onrender.com`
+
 ## Architecture du projet
 
 ```
