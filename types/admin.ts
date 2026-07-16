@@ -441,6 +441,7 @@ export type InsightsQuery = {
   from?: string
   to?: string
   limit?: number
+  userEmail?: string
 }
 
 export type InsightsOverview = {

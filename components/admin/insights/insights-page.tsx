@@ -8,8 +8,10 @@ import {
   Eye,
   Heart,
   Route,
+  Search,
   Sparkles,
   Target,
+  X,
 } from "lucide-react"
 import {
   Bar,
@@ -23,6 +25,7 @@ import {
 } from "recharts"
 import { ErrorMessage } from "@/components/admin/error-message"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { adminApi } from "@/lib/api/admin"
 import type {
   InsightsActivityPoint,
@@ -564,14 +567,32 @@ function ProductDecisionCard({ data }: { data: InsightsState }) {
 
 export function InsightsPage() {
   const [period, setPeriod] = useState<PeriodKey>("14d")
+  const [emailInput, setEmailInput] = useState("")
+  const [userEmail, setUserEmail] = useState("")
   const [data, setData] = useState<InsightsState | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
-  const query = useMemo(() => getPeriodQuery(period), [period])
+  const query = useMemo(
+    () => ({
+      ...getPeriodQuery(period),
+      userEmail: userEmail.trim().toLowerCase() || undefined,
+    }),
+    [period, userEmail]
+  )
   const headerSummary = data
     ? `${data.overview.activeUsers} utilisateurs actifs estimés · ${data.overview.testsStarted} tests démarrés · ${data.overview.jobViews} fiches métier vues`
     : "Chargement des données produit..."
+  const activeUserFilter = userEmail.trim().toLowerCase()
+
+  const applyUserFilter = () => {
+    setUserEmail(emailInput.trim().toLowerCase())
+  }
+
+  const clearUserFilter = () => {
+    setEmailInput("")
+    setUserEmail("")
+  }
 
   useEffect(() => {
     let ignore = false
@@ -654,6 +675,45 @@ export function InsightsPage() {
             </div>
           </div>
         </div>
+      </section>
+
+      <section className="matcha-card p-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h2 className="text-base font-bold">Filtrer par utilisateur</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Saisis un email pour isoler les événements et résultats associés.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <Input
+              type="email"
+              placeholder="email@exemple.com"
+              value={emailInput}
+              onChange={(event) => setEmailInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") applyUserFilter()
+              }}
+              className="sm:w-72"
+            />
+            <Button type="button" onClick={applyUserFilter}>
+              <Search className="size-4" />
+              Filtrer
+            </Button>
+            {activeUserFilter && (
+              <Button type="button" variant="outline" onClick={clearUserFilter}>
+                <X className="size-4" />
+                Effacer
+              </Button>
+            )}
+          </div>
+        </div>
+        {activeUserFilter && (
+          <p className="mt-3 rounded-xl bg-accent/45 px-3 py-2 text-sm text-muted-foreground">
+            Vue filtrée sur{" "}
+            <span className="font-semibold">{activeUserFilter}</span>
+          </p>
+        )}
       </section>
 
       <ErrorMessage message={error} />
