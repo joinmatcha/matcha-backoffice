@@ -499,7 +499,7 @@ function ProductDecisionCard({ data }: { data: InsightsState }) {
   const weakestTest = data.tests
     .slice()
     .sort((a, b) => b.abandonmentRate - a.abandonmentRate)[0]
-  const gap = data.jobs.recommendationInterestGap[0]
+  const gap = data.jobs.matchInterestGap[0]
   const topLikedJob = data.jobs.liked[0]
   const topSkill = data.orientation.competenceStrengths[0]
   const topLikedDomain = data.jobs.domains.liked[0]
@@ -541,7 +541,7 @@ function ProductDecisionCard({ data }: { data: InsightsState }) {
           <p className="mt-3 font-semibold">Matching métier</p>
           <p className="mt-2 leading-6 text-muted-foreground">
             {gap
-              ? `${gap.title} apparaît dans les recommandations sans générer le même niveau d'intérêt. Volume concerné : ${gap.count}.`
+              ? `${gap.title} apparaît dans les métiers matchés sans générer le même niveau d'intérêt. Volume concerné : ${gap.count}.`
               : topLikedJob
                 ? `${topLikedJob.title} est le métier le plus liké sur la période (${topLikedJob.count}).`
                 : "Aucun signal métier exploitable sur la période."}
@@ -787,13 +787,13 @@ export function InsightsPage() {
               emptyLabel="Aucun métier liké."
             />
             <JobsTable
-              title="Recommandés mais peu transformés"
+              title="Matchés mais peu transformés"
               signal={
-                data.jobs.recommendationInterestGap[0]
-                  ? `${data.jobs.recommendationInterestGap[0].title} concentre l'écart le plus visible.`
-                  : "Aucun écart recommandation/intérêt détecté."
+                data.jobs.matchInterestGap[0]
+                  ? `${data.jobs.matchInterestGap[0].title} concentre l'écart le plus visible.`
+                  : "Aucun écart match/intérêt détecté."
               }
-              jobs={data.jobs.recommendationInterestGap}
+              jobs={data.jobs.matchInterestGap}
               emptyLabel="Aucun écart marqué sur la période."
             />
           </section>
@@ -811,11 +811,11 @@ export function InsightsPage() {
               />
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
                 <div>
-                  <h3 className="mb-3 text-sm font-bold">Recommandés</h3>
+                  <h3 className="mb-3 text-sm font-bold">Matchés</h3>
                   <BarList
                     items={data.jobs.domains.matched}
                     labelKey="domain"
-                    emptyLabel="Aucun domaine recommandé."
+                    emptyLabel="Aucun domaine matché."
                   />
                 </div>
                 <div>
