@@ -29,6 +29,7 @@ export function UserDetailDialog({ detail, onClose }: UserDetailDialogProps) {
               <ProfilePanel detail={detail} />
               <PersonalityTestsPanel detail={detail} />
               <BilansPanel detail={detail} />
+              <MatchingProfilePanel detail={detail} />
             </section>
 
             <aside className="space-y-3">
@@ -98,6 +99,11 @@ function PersonalityTestsPanel({ detail }: { detail: AdminUserDetail }) {
             <p className="text-muted-foreground">
               Version {test.templateVersion}
             </p>
+            {test.suggestedSectors?.length ? (
+              <p className="mt-2 text-muted-foreground">
+                Secteurs : {test.suggestedSectors.slice(0, 4).join(", ")}
+              </p>
+            ) : null}
           </div>
         ))}
         {detail.personalityTests.length === 0 && (
@@ -123,12 +129,92 @@ function BilansPanel({ detail }: { detail: AdminUserDetail }) {
                 {bilan.profileSummary}
               </p>
             )}
+            {bilan.recommendedSectors?.length ? (
+              <p className="mt-2 text-muted-foreground">
+                Secteurs : {bilan.recommendedSectors.slice(0, 4).join(", ")}
+              </p>
+            ) : null}
           </div>
         ))}
         {detail.bilans.length === 0 && (
           <p className="text-sm text-muted-foreground">Aucun bilan généré.</p>
         )}
       </div>
+    </div>
+  )
+}
+
+function MatchingProfilePanel({ detail }: { detail: AdminUserDetail }) {
+  const profile = detail.recommendationProfile
+
+  return (
+    <div className="rounded-2xl bg-accent/45 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="font-semibold">Matching métier</h3>
+        {profile && (
+          <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-foreground">
+            {profile.unlocked
+              ? "Débloqué"
+              : `En attente : ${profile.missingSources.join(", ") || "-"}`}
+          </span>
+        )}
+      </div>
+
+      {!profile && (
+        <p className="mt-3 text-sm text-muted-foreground">
+          Aucun profil de matching calculé.
+        </p>
+      )}
+
+      {profile && (
+        <div className="mt-3 space-y-3 text-sm">
+          <div className="rounded-xl bg-white/65 p-3">
+            <p className="font-medium">Secteurs consolidés</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {profile.sectors.length ? (
+                profile.sectors.map((sector) => (
+                  <span
+                    key={sector.key}
+                    className="rounded-full bg-accent px-3 py-1 text-xs text-foreground"
+                  >
+                    {sector.label} · {sector.weight.toFixed(1)}
+                  </span>
+                ))
+              ) : (
+                <p className="text-muted-foreground">Aucun secteur consolidé.</p>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            {profile.matchedJobs.map((job) => (
+              <div key={job.id} className="rounded-xl bg-white/65 p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-medium">{job.title}</p>
+                    <p className="text-muted-foreground">
+                      {job.sector ?? "Secteur inconnu"} · {job.code}
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
+                    {Math.round(job.score)}
+                  </span>
+                </div>
+                {job.reasons.length ? (
+                  <p className="mt-2 text-muted-foreground">
+                    {job.reasons.slice(0, 2).join(" · ")}
+                  </p>
+                ) : null}
+              </div>
+            ))}
+            {!profile.matchedJobs.length && (
+              <p className="text-muted-foreground">
+                Aucun métier matché pour le moment.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

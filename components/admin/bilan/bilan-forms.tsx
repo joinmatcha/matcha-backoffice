@@ -27,7 +27,7 @@ export const emptyBilanVersionForm: BilanVersionForm = {
 
 export const emptyBilanQuestionForm: BilanQuestionForm = {
   code: "",
-  domain: "experience",
+  domain: "competence",
   subdomain: "",
   question: "",
   type: "likert_1_5",
@@ -123,7 +123,6 @@ export function BilanQuestionFields({
           className={selectClassName}
         >
           <option value="likert_1_5">Likert 1-5</option>
-          <option value="open_text">Texte libre</option>
         </select>
       </div>
       <Input

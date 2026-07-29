@@ -232,14 +232,14 @@ describe("adminApi", () => {
         method: "POST",
       },
       {
-        call: () => adminApi.listBilanQuestions({ domain: "experience" }),
-        url: "/api/admin/bilan-questions?domain=experience",
+        call: () => adminApi.listBilanQuestions({ domain: "competence" }),
+        url: "/api/admin/bilan-questions?domain=competence",
       },
       {
         call: () =>
           adminApi.createBilanQuestion({
-            code: "EXP_1",
-            domain: "experience",
+            code: "C_1",
+            domain: "competence",
             question: "Question",
             type: "likert_1_5",
             version: 1,

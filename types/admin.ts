@@ -16,13 +16,12 @@ export type SupportRequestStatus =
   | "closed"
 export type PersonalityDimension = "EI" | "SN" | "TF" | "JP"
 export type BilanQuestionDomain =
-  | "experience"
   | "competence"
   | "soft_skill"
   | "value"
   | "work_condition"
   | "interest"
-export type BilanQuestionType = "likert_1_5" | "open_text"
+export type BilanQuestionType = "likert_1_5"
 export type WorkStyleDimension =
   | "autonomy"
   | "collaboration"
@@ -102,7 +101,7 @@ export type AdminUserDetail = {
     description?: string
     traits?: string[]
     weaknesses?: string[]
-    motivationProfile?: string[]
+    suggestedSectors?: string[]
     createdAt?: string
   }>
   bilans: Array<{
@@ -117,14 +116,28 @@ export type AdminUserDetail = {
     }
     profileSummary?: string
     keyStrengths?: string[]
-    recommendedJobs?: Array<{
+    recommendedSectors?: string[]
+  }>
+  recommendationProfile: null | {
+    unlocked: boolean
+    completedSources: string[]
+    missingSources: string[]
+    sectors: Array<{
+      key: string
+      label: string
+      weight: number
+      sources: string[]
+    }>
+    matchedJobs: Array<{
       id: string
+      code: string
       title: string
-      description?: string
       sector?: string
       score: number
+      reasons: string[]
     }>
-  }>
+    recalculatedAt?: string
+  }
   swipes: {
     likes: number
     dislikes: number
@@ -297,7 +310,7 @@ export type PersonalityProfile = {
   description?: string
   strengths?: string[]
   weaknesses?: string[]
-  recommendedJobs?: string[]
+  suggestedSectors?: string[]
   isActive?: boolean
 }
 
@@ -497,7 +510,7 @@ export type InsightsJobs = {
     matched: InsightsDomainMetric[]
     liked: InsightsDomainMetric[]
   }
-  recommendationInterestGap: InsightsJobMetric[]
+  matchInterestGap: InsightsJobMetric[]
 }
 
 export type InsightsOrientationItem = {

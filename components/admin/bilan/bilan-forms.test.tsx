@@ -45,12 +45,12 @@ describe("BilanQuestionFields", () => {
 
     render(<BilanQuestionFields form={form} setForm={setForm} />)
 
-    await user.selectOptions(screen.getByDisplayValue("Expérience"), "competence")
+    await user.selectOptions(screen.getByDisplayValue("Compétence"), "soft_skill")
     await user.click(screen.getByLabelText("Question active"))
 
     expect(setForm).toHaveBeenCalledWith({
       ...form,
-      domain: "competence",
+      domain: "soft_skill",
     })
     expect(setForm).toHaveBeenCalledWith({
       ...form,
