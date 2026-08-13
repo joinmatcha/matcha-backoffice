@@ -3,6 +3,10 @@ import { NextRequest, NextResponse } from "next/server"
 const ADMIN_COOKIE_NAME = "admin_token"
 
 function getExternalLoginUrl() {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return `${process.env.NEXT_PUBLIC_API_URL}/api/admin/auth/login`
+  }
+
   const protocol = process.env.NEXT_PUBLIC_API_PROTOCOL ?? "http"
   const host = process.env.NEXT_PUBLIC_API_HOST
   const port = process.env.NEXT_PUBLIC_API_PORT
